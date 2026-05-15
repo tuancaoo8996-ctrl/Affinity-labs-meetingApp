@@ -1,41 +1,37 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+# Secrets — never commit
+**/.env
+**/.env.local
+**/firebase-service-account.json
+**/GoogleService-Info.plist
+**/google-services.json
 
-# dependencies
-node_modules/
+# Python
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
 
-# Expo
-.expo/
-dist/
-web-build/
-expo-env.d.ts
+# Node
+mobile/node_modules/
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
 
-# Native
-.kotlin/
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
+# iOS / Android build artifacts
+mobile/ios/Pods/
+mobile/ios/build/
+mobile/android/build/
+mobile/android/app/build/
+mobile/android/.gradle/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcuserstate
 
-# Metro
-.metro-health-check*
-
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macOS
+# macOS / IDE
 .DS_Store
-*.pem
+.idea/
+.vscode/
 
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-# generated native folders
-/ios
-/android
+# Logs
+/tmp/backend.log
+*.log
