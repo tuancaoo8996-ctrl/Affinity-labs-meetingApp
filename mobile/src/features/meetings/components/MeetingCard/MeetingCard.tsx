@@ -103,7 +103,7 @@ const STATUS_CONFIG: Record<EMeetingStatus, { label: string; color: string; bg: 
   [EMeetingStatus.PENDING]: { label: 'Pending', color: Colors.textSecondary, bg: Colors.surfaceAlt },
   [EMeetingStatus.PROCESSING]: { label: 'Processing', color: Colors.amber, bg: '#2A2010' },
   [EMeetingStatus.DONE]: { label: 'Done', color: Colors.green, bg: '#102210' },
-  [EMeetingStatus.ERROR]: { label: 'Error', color: Colors.red, bg: '#221010' },
+  [EMeetingStatus.ERROR]: { label: 'Failed', color: '#FF6B6B', bg: '#221010' },
 };
 
 function formatDuration(seconds: number): string {
