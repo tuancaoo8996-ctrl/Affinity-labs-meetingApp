@@ -117,7 +117,6 @@ export function useAudioRecorder() {
     try {
       await recordingRef.current.startAsync();
       setStatus(ERecordingStatus.RECORDING);
-      // Resume timer from current duration
       const currentMs = useRecordingStore.getState().durationMs;
       startTimeRef.current = Date.now() - currentMs;
       timerRef.current = setInterval(() => {
@@ -139,7 +138,6 @@ export function useAudioRecorder() {
       setAudioUri(uri);
       setStatus(ERecordingStatus.STOPPED);
 
-      // Restore audio session for playback
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: false,
         playsInSilentModeIOS: true,

@@ -63,14 +63,11 @@ export default function MeetingsScreen() {
 
   const handleDelete = useCallback(
     (meeting: TMeeting) => {
-      // Optimistic remove
       setMeetings((prev) => prev.filter((m) => m.id !== meeting.id));
       recentlyDeletedRef.current.set(meeting.id, meeting);
 
-      // Fire-and-forget API call
       softDeleteMeeting(meeting.id).catch((err) => {
         console.error('[softDelete] failed:', err);
-        // Rollback on failure
         setMeetings((prev) =>
           [...prev, meeting].sort((a, b) =>
             b.created_at.localeCompare(a.created_at)
@@ -80,7 +77,6 @@ export default function MeetingsScreen() {
         Alert.alert('Delete failed', 'Could not delete meeting. Please try again.');
       });
 
-      // Show undo toast
       Toast.show({
         type: 'info',
         text1: 'Meeting moved to trash',
@@ -91,7 +87,6 @@ export default function MeetingsScreen() {
           const stored = recentlyDeletedRef.current.get(meeting.id);
           if (!stored) return;
           recentlyDeletedRef.current.delete(meeting.id);
-          // Optimistic restore
           setMeetings((prev) =>
             [...prev, stored].sort((a, b) =>
               b.created_at.localeCompare(a.created_at)
@@ -107,7 +102,6 @@ export default function MeetingsScreen() {
         },
       });
 
-      // Cleanup memory after toast window
       setTimeout(() => {
         recentlyDeletedRef.current.delete(meeting.id);
       }, 6000);

@@ -35,7 +35,6 @@ export default function RecordScreen() {
   const userId = useCurrentUserId();
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  // Open attendees sheet on first tap (IDLE/STOPPED/ERROR)
   const handleButtonPress = useCallback(async () => {
     switch (status) {
       case ERecordingStatus.IDLE:
@@ -52,10 +51,8 @@ export default function RecordScreen() {
     }
   }, [status, pauseRecording, resumeRecording]);
 
-  // Called when user confirms attendees (or skips)
   const handleAttendeesConfirmed = useCallback(async (attendees: TAttendee[]) => {
     await startRecording();
-    // Store attendees in ref so handleStop can access them
     attendeesRef.current = attendees;
   }, [startRecording]);
 
@@ -144,12 +141,10 @@ export default function RecordScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
           <Text style={styles.appName}>Meeting Notes</Text>
         </View>
 
-        {/* Center — Timer + Waveform + Button */}
         <View style={styles.center}>
           <RecordingTimer durationMs={durationMs} isRecording={isRecordingActive} />
 
@@ -162,7 +157,6 @@ export default function RecordScreen() {
           <Text style={styles.statusLabel}>{getStatusLabel(status)}</Text>
         </View>
 
-        {/* Stop button */}
         <View style={styles.footer}>
           {canStop && (
             <View style={styles.stopButton}>
@@ -183,7 +177,6 @@ export default function RecordScreen() {
         </View>
       </View>
 
-      {/* Attendees Bottom Sheet — rendered outside container to overlay correctly */}
       <AttendeesBottomSheet
         sheetRef={bottomSheetRef}
         onStart={handleAttendeesConfirmed}

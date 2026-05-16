@@ -77,7 +77,6 @@ export default function AttendeesBottomSheet({ onStart, onDismiss, sheetRef }: P
           <Text style={styles.title}>Who's in this meeting?</Text>
           <Text style={styles.subtitle}>Optional — helps AI identify speakers</Text>
 
-          {/* Attendee chips */}
           {attendees.length > 0 && (
             <View style={styles.chips}>
               {attendees.map((a) => (
@@ -89,7 +88,6 @@ export default function AttendeesBottomSheet({ onStart, onDismiss, sheetRef }: P
             </View>
           )}
 
-          {/* Input row */}
           <View style={styles.inputRow}>
             <TextInput
               ref={inputRef}
@@ -111,7 +109,6 @@ export default function AttendeesBottomSheet({ onStart, onDismiss, sheetRef }: P
             </Pressable>
           </View>
 
-          {/* Actions */}
           <View style={styles.actions}>
             <Pressable style={styles.startBtn} onPress={handleStart}>
               <Text style={styles.startBtnText}>Start Recording</Text>

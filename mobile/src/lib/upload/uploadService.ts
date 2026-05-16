@@ -28,7 +28,6 @@ export async function uploadAudioWithRetry(
 
       if (uploadError) throw uploadError;
 
-      // 24h signed URL for backend download
       const { data: signed, error: signError } = await supabase.storage
         .from(BUCKET)
         .createSignedUrl(path, 86400);
@@ -40,7 +39,7 @@ export async function uploadAudioWithRetry(
       lastError = err;
       console.error(`[Upload] attempt ${attempt} failed:`, JSON.stringify(err));
       if (attempt < maxRetries) {
-        await delay(attempt * 1000); // 1s, 2s, 3s
+        await delay(attempt * 1000);
       }
     }
   }

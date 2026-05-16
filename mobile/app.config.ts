@@ -19,11 +19,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: false,
     bundleIdentifier: 'com.ancebu.tod',
     googleServicesFile: './GoogleService-Info.plist',
-    infoPlist: {
-      // UIBackgroundModes and NSMicrophoneUsageDescription are set by
-      // ./plugins/withBackgroundAudio — do not duplicate here.
-      // remote-notification is handled by @react-native-firebase/messaging plugin.
-    },
   },
   android: {
     package: 'com.ancebu.tod',

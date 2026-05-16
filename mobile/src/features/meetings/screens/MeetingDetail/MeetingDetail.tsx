@@ -30,7 +30,6 @@ export default function MeetingDetailScreen() {
       setLoading(false);
     });
 
-    // Live status update via Supabase Realtime
     const channel = subscribeMeetingStatus(id, (_status, updated) => {
       setMeeting((prev) => (prev ? { ...prev, ...updated } : prev));
     });
@@ -88,18 +87,15 @@ export default function MeetingDetailScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Title + Meta */}
         <Text style={styles.title}>{meeting.title}</Text>
         <Text style={styles.meta}>
           {formatDuration(meeting.duration_seconds)} · {formatDate(meeting.created_at)}
         </Text>
 
-        {/* Audio Playback */}
         {meeting.audio_url && meeting.status === EMeetingStatus.DONE && (
           <PlaybackCard audioUrl={meeting.audio_url} />
         )}
 
-        {/* Processing state */}
         {(meeting.status === EMeetingStatus.PENDING ||
           meeting.status === EMeetingStatus.PROCESSING) && (
           <View style={styles.processingBanner}>
@@ -112,7 +108,6 @@ export default function MeetingDetailScreen() {
           </View>
         )}
 
-        {/* Speakers */}
         {meeting.speakers && meeting.speakers.length > 0 && (
           <Section title="Speakers">
             <View style={styles.speakerRow}>
@@ -130,7 +125,6 @@ export default function MeetingDetailScreen() {
           </Section>
         )}
 
-        {/* Summary */}
         {meeting.summary && (
           <>
             {meeting.summary.key_decisions?.length > 0 && (
@@ -163,7 +157,6 @@ export default function MeetingDetailScreen() {
           </>
         )}
 
-        {/* Transcript */}
         {meeting.transcript && meeting.transcript.length > 0 && (
           <Section
             title="Transcript"
