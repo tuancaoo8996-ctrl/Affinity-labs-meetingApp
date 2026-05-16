@@ -114,8 +114,7 @@ async def run_pipeline(payload: ProcessMeetingRequest) -> None:
 
     except Exception as e:
         await update_status("error")
-        print(f"[pipeline error] meeting={payload.meeting_id} error={e}")
-        raise
+        print(f"[pipeline error] meeting={payload.meeting_id} error={e}", flush=True)
 
 
 @router.post("/process-meeting", status_code=202)

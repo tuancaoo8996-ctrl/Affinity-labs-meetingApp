@@ -2,11 +2,13 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '../src/components/AppToast';
-import { useNotifications } from '../src/hooks/useNotifications';
-import { useRecordingLifecycle } from '../src/hooks/useRecordingRecovery';
+import { toastConfig } from '@/src/features/notifications/components/AppToast';
+import { useNotifications } from '@/src/features/notifications/hooks';
+import { useRecordingLifecycle } from '@/src/features/recording/hooks';
+import { useAnonAuth } from '@/src/features/auth';
 
 export default function RootLayout() {
+  useAnonAuth();
   useNotifications();
   useRecordingLifecycle();
 
