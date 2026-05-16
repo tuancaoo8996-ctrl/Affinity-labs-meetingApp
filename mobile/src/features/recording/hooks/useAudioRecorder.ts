@@ -72,6 +72,12 @@ export function useAudioRecorder() {
 
   const startRecording = useCallback(async () => {
     try {
+      // Cleanup stale recording instance from previous session if any
+      if (recordingRef.current) {
+        try { await recordingRef.current.stopAndUnloadAsync(); } catch { /* ignore */ }
+        recordingRef.current = null;
+      }
+
       await configureAudioSession();
 
       const { recording } = await Audio.Recording.createAsync(

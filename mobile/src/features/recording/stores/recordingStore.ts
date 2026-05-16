@@ -46,33 +46,15 @@ export const useRecordingStore = create<RecordingState>()(
     {
       name: 'recording-state',
       storage: createJSONStorage(() => mmkvStorage),
-      // Only persist recovery-relevant fields, not ephemeral timer
       partialize: (state) => ({
         status: state.status,
         audioUri: state.audioUri,
         activeMeetingId: state.activeMeetingId,
         attendees: state.attendees,
       }),
-      // On rehydrate: any non-terminal state means app was killed mid-flow.
-      // - RECORDING/PAUSED: audio data lost → ERROR
-      // - UPLOADING/PROCESSING: meeting đã tạo trên server → RECOVERING (reconcile sau)
-      // useRecordingLifecycle sẽ chạy ở root layout để query server và set state đúng
+      // Only IDLE is valid on boot — any other persisted state is a stale artifact
       onRehydrateStorage: () => (state) => {
-        if (!state) return;
-        if (
-          state.status === ERecordingStatus.RECORDING ||
-          state.status === ERecordingStatus.PAUSED
-        ) {
-          state.setStatus(ERecordingStatus.ERROR);
-          state.setError('Recording interrupted — app was closed.');
-          return;
-        }
-        if (
-          state.status === ERecordingStatus.UPLOADING ||
-          state.status === ERecordingStatus.PROCESSING
-        ) {
-          state.setStatus(ERecordingStatus.RECOVERING);
-        }
+        if (state && state.status !== ERecordingStatus.IDLE) state.reset();
       },
     }
   )

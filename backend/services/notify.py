@@ -38,6 +38,7 @@ async def send_push_notification(fcm_token: str, meeting_id: str, title: str) ->
         ),
         data={"meetingId": meeting_id},
         apns=messaging.APNSConfig(
+            headers={"apns-push-type": "alert", "apns-priority": "10"},
             payload=messaging.APNSPayload(
                 aps=messaging.Aps(sound="default", badge=1),
             ),

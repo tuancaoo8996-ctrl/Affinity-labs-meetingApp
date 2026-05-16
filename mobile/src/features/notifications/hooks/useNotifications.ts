@@ -77,9 +77,10 @@ export function useNotifications() {
 }
 
 async function registerForPushNotificationsAsync(): Promise<string | null> {
-  const { status: existing } = await Notifications.getPermissionsAsync();
-  let finalStatus = existing;
-  if (existing !== 'granted') {
+  const existing = await Notifications.getPermissionsAsync();
+  console.log('[FCM] existing permissions:', JSON.stringify(existing));
+  let finalStatus = existing.status;
+  if (existing.status !== 'granted') {
     const { status } = await Notifications.requestPermissionsAsync({
       ios: {
         allowAlert: true,

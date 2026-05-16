@@ -119,6 +119,8 @@ export default function RecordScreen() {
       }
 
       setStatus(ERecordingStatus.PROCESSING);
+      // Small delay so Supabase INSERT propagates before MeetingsList fetches
+      await new Promise((r) => setTimeout(r, 600));
       router.push('/meetings');
     } catch (err) {
       console.error('[handleStop] ERROR:', err);

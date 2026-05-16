@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { router } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import type { TMeeting } from '@/src/features/meetings/types';
 import {
@@ -40,14 +41,24 @@ export default function MeetingsScreen() {
     }
   }, [userId]);
 
+  // Re-fetch every time the tab comes into focus to catch meetings inserted
+  // while the screen was unmounted (timing race between createMeeting + navigate).
+  useFocusEffect(
+    useCallback(() => {
+      if (!userId) return;
+      loadMeetings();
+    }, [userId, loadMeetings])
+  );
+
   useEffect(() => {
     if (!userId) return;
-    loadMeetings();
 
     const channel = subscribeMeetingsList(
       userId,
       (newMeeting) => {
-        setMeetings((prev) => [newMeeting, ...prev]);
+        setMeetings((prev) =>
+          prev.some((m) => m.id === newMeeting.id) ? prev : [newMeeting, ...prev]
+        );
       },
       (updated) => {
         setMeetings((prev) =>
@@ -59,7 +70,7 @@ export default function MeetingsScreen() {
     return () => {
       channel.unsubscribe();
     };
-  }, [userId, loadMeetings]);
+  }, [userId]);
 
   const handleDelete = useCallback(
     (meeting: TMeeting) => {

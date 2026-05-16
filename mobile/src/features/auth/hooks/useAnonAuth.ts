@@ -20,9 +20,11 @@ export function useAnonAuth() {
     (async () => {
       const { data } = await supabase.auth.getSession();
       let userId = data.session?.user.id ?? null;
+      console.log('[useAnonAuth] getSession uid:', userId);
 
       if (!userId) {
         const { data: signIn, error } = await supabase.auth.signInAnonymously();
+        console.log('[useAnonAuth] signInAnonymously uid:', signIn?.user?.id);
         if (error) {
           console.error('[useAnonAuth] signInAnonymously failed:', error);
           if (!cancelled) setSession(null);
