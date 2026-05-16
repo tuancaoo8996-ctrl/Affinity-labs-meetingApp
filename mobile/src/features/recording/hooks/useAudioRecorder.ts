@@ -44,7 +44,8 @@ export function useAudioRecorder() {
   } = useRecordingStore();
 
   const configureAudioSession = useCallback(async () => {
-    await Audio.requestPermissionsAsync();
+    const { granted } = await Audio.requestPermissionsAsync();
+    if (!granted) throw new Error('Microphone permission denied');
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: true,
       playsInSilentModeIOS: true,

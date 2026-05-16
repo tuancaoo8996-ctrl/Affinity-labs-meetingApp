@@ -20,9 +20,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: 'com.ancebu.tod',
     googleServicesFile: './GoogleService-Info.plist',
     infoPlist: {
-      NSMicrophoneUsageDescription:
-        'Meeting Notes uses your microphone to record meetings.',
-      UIBackgroundModes: ['audio', 'remote-notification'],
+      // UIBackgroundModes and NSMicrophoneUsageDescription are set by
+      // ./plugins/withBackgroundAudio — do not duplicate here.
+      // remote-notification is handled by @react-native-firebase/messaging plugin.
     },
   },
   android: {

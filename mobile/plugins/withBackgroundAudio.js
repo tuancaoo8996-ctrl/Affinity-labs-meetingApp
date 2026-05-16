@@ -1,27 +1,40 @@
-const { withInfoPlist, withAndroidManifest } = require('@expo/config-plugins');
+const {
+  withInfoPlist,
+  withAndroidManifest,
+  withMainApplication,
+} = require('@expo/config-plugins');
 
 /**
  * Custom config plugin: enables background audio recording on iOS and Android.
  *
  * iOS:
- *   - Adds UIBackgroundModes = ['audio'] to Info.plist
- *   - Sets NSMicrophoneUsageDescription
+ *   - UIBackgroundModes → ['audio'] in Info.plist
+ *     (required for AVAudioSession to stay active when app is backgrounded)
+ *   - NSMicrophoneUsageDescription for runtime mic permission prompt
  *
  * Android:
- *   - Adds RECORD_AUDIO, FOREGROUND_SERVICE, FOREGROUND_SERVICE_MICROPHONE permissions
- *   - Declares a foreground service with foregroundServiceType="microphone"
+ *   - RECORD_AUDIO: runtime permission to access microphone
+ *   - FOREGROUND_SERVICE: allows starting a foreground service (required on Android 9+)
+ *   - FOREGROUND_SERVICE_MICROPHONE: scoped permission for mic foreground service (Android 14+)
+ *   - RecordingForegroundService with foregroundServiceType="microphone"
+ *     so Android knows this service legitimately needs mic in background
+ *   - Notification channel "recording_channel" (Android 8+ requirement):
+ *     foreground services must post a visible notification — the channel must
+ *     exist before the service starts or the app crashes with a bad notification
+ *     exception
  */
 const withBackgroundAudio = (config) => {
   // ─── iOS ───────────────────────────────────────────────────────────────────
   config = withInfoPlist(config, (mod) => {
     const plist = mod.modResults;
 
-    // UIBackgroundModes
     const modes = plist.UIBackgroundModes ?? [];
+    // 'audio' — keeps AVAudioSession alive when app is backgrounded
     if (!modes.includes('audio')) modes.push('audio');
+    // 'remote-notification' — allows FCM data-only pushes to wake the app
+    if (!modes.includes('remote-notification')) modes.push('remote-notification');
     plist.UIBackgroundModes = modes;
 
-    // Microphone usage description (fallback if not set in app.config)
     if (!plist.NSMicrophoneUsageDescription) {
       plist.NSMicrophoneUsageDescription =
         'Meeting Notes uses your microphone to record meetings.';
@@ -30,11 +43,10 @@ const withBackgroundAudio = (config) => {
     return mod;
   });
 
-  // ─── Android ───────────────────────────────────────────────────────────────
+  // ─── Android — permissions + service declaration ───────────────────────────
   config = withAndroidManifest(config, (mod) => {
     const manifest = mod.modResults.manifest;
 
-    // Permissions
     const requiredPermissions = [
       'android.permission.RECORD_AUDIO',
       'android.permission.FOREGROUND_SERVICE',
@@ -51,7 +63,6 @@ const withBackgroundAudio = (config) => {
       }
     }
 
-    // Foreground service declaration
     const app = manifest.application[0];
     app.service = app.service ?? [];
 
@@ -66,6 +77,35 @@ const withBackgroundAudio = (config) => {
           'android:exported': 'false',
         },
       });
+    }
+
+    return mod;
+  });
+
+  // ─── Android — notification channel (required on Android 8+ / API 26+) ────
+  config = withMainApplication(config, (mod) => {
+    const src = mod.modResults.contents;
+
+    const channelCode = `
+    // Background audio recording notification channel (required on Android 8+)
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+      android.app.NotificationChannel channel = new android.app.NotificationChannel(
+        "recording_channel",
+        "Recording",
+        android.app.NotificationManager.IMPORTANCE_LOW
+      );
+      channel.setDescription("Shows while a meeting is being recorded in the background");
+      android.app.NotificationManager nm =
+        (android.app.NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+      if (nm != null) nm.createNotificationChannel(channel);
+    }`;
+
+    // Inject once, right after super.onCreate()
+    if (!src.includes('recording_channel')) {
+      mod.modResults.contents = src.replace(
+        'super.onCreate()',
+        `super.onCreate()${channelCode}`
+      );
     }
 
     return mod;
