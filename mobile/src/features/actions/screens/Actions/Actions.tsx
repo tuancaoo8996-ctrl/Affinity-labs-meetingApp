@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { getMeetings } from '@/src/features/meetings/services';
 import { Colors } from '@/src/constants/colors';
 import { EMeetingStatus } from '@/src/features/meetings/enums';
@@ -25,23 +26,26 @@ export default function ActionsScreen() {
   const [actions, setActions] = useState<EnrichedAction[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!userId) return;
-    getMeetings(userId)
-      .then((meetings) => {
-        const all: EnrichedAction[] = meetings
-          .filter((m) => m.status === EMeetingStatus.DONE && m.summary?.action_items?.length)
-          .flatMap((m) =>
-            (m.summary!.action_items ?? []).map((a) => ({
-              ...a,
-              meetingId: m.id,
-              meetingTitle: m.title,
-            }))
-          );
-        setActions(all);
-      })
-      .finally(() => setLoading(false));
-  }, [userId]);
+  useFocusEffect(
+    useCallback(() => {
+      if (!userId) return;
+      setLoading(true);
+      getMeetings(userId)
+        .then((meetings) => {
+          const all: EnrichedAction[] = meetings
+            .filter((m) => m.status === EMeetingStatus.DONE && m.summary?.action_items?.length)
+            .flatMap((m) =>
+              (m.summary!.action_items ?? []).map((a) => ({
+                ...a,
+                meetingId: m.id,
+                meetingTitle: m.title,
+              }))
+            );
+          setActions(all);
+        })
+        .finally(() => setLoading(false));
+    }, [userId])
+  );
 
   if (loading) {
     return (
